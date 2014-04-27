@@ -1,1 +1,0 @@
-(function(){dust.register("template",body_0);function body_0(chk,ctx){return chk.section(ctx.get(["person"], false),ctx,{"block":body_1},{"foo":ctx.get(["root"], false)});}function body_1(chk,ctx){return chk.reference(ctx.get(["foo"], false),ctx,"h").write(": ").reference(ctx.get(["name"], false),ctx,"h").write(", ").reference(ctx.get(["age"], false),ctx,"h");}return body_0;})();

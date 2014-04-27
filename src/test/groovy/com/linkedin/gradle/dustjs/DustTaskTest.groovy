@@ -44,7 +44,7 @@ class DustTaskTest extends Specification {
 
   @Rule TemporaryFolder dir = new TemporaryFolder()
 
-  Project project = ProjectBuilder.builder.build()
+  Project project = ProjectBuilder.builder().build()
   DustTask dustjs
 
   def setup() {
@@ -63,19 +63,19 @@ class DustTaskTest extends Specification {
 
   def 'set source as a string'() {
     given:
-    def provided = getProvided("template.tl")
+    def provided = getProvided("inline-outer.tl")
 
     when:
     dustjs.source = provided.absolutePath
 
     then:
     dustjs.getSourceFiles().files.size() == 1
-    dustjs.getSourceFiles.singleFile == provided
+    dustjs.getSourceFiles().singleFile == provided
   }
 
-  def 'sample run of dust'() {
+  def 'compile single file'() {
     given:
-    File sourceFile = getProvided("template.tl")
+    File sourceFile = getProvided("inline-outer.tl")
     dustjs.source = new FileTreeMock(dir: sourceFile.parentFile,
                                      files: [sourceFile])
 
@@ -83,9 +83,71 @@ class DustTaskTest extends Specification {
     dustjs.run()
 
     then:
-    def actual = getGenerated("template.js").readLines()
-    def expected = getProvided("template.js").readLines()
+    def actual = getGenerated("inline-outer.js").readLines()
+    def expected = getProvided("inline-outer.js").readLines()
     actual == expected
     dustjs.getLessPath() == 'dust-full-v2.3.4.js'
+  }
+
+  def 'compile multiple files'() {
+    given:
+    File sourceFile = getProvided("inline-outer.tl")
+    dustjs.source = new FileTreeMock(
+        dir: sourceFile.parentFile,
+        files: [sourceFile, getProvided("force-local.tl")])
+
+    when:
+    dustjs.run()
+
+    then:
+    def actual = [
+      getGenerated("inline-outer.js").readLines(),
+      getGenerated("force-local.js").readLines()
+    ]
+    def expected = [
+      getProvided("inline-outer.js").readLines(),
+      getProvided("force-local.js").readLines()
+    ]
+    actual == expected
+  }
+
+  def 'invalid compiler version'() {
+    given:
+    File sourceFile = getProvided("inline-outer.tl")
+    dustjs.source = new FileTreeMock(dir: sourceFile.parentFile,
+                                     files: [sourceFile])
+    dustjs.dustVersion = '5.0.0'
+
+    when:
+    dustjs.run()
+
+    then:
+    thrown(InvalidUserDataException)
+  }
+
+  def 'invalid without source'() {
+    given:
+    dustjs.source = null
+    // Note: dustjs.dest != null here. See setup().
+
+    when:
+    dustjs.run()
+
+    then:
+    thrown(InvalidUserDataException)
+  }
+
+  def 'invalid without dest'() {
+    given:
+    File sourceFile = getProvided("inline-outer.tl")
+    dustjs.source = new FileTreeMock(dir: sourceFile.parentFile,
+                                     files: [sourceFile])
+    dustjs.dest = null
+
+    when:
+    dustjs.run()
+
+    then:
+    thrown(InvalidUserDataException)
   }
 }
