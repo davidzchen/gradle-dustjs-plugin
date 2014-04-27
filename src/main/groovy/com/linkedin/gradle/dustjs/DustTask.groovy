@@ -1,10 +1,8 @@
 package com.linkedin.gradle.dustjs
 
-import com.linkedin.gradle.dustjs.ResourceUtil
-import com.linkedin.gradle.dustjs.RhinoExec
-
 import org.gradle.api.DefaultTask
 import org.gradle.api.InvalidUserDataException
+import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.file.FileTree
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
@@ -12,6 +10,9 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
+
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class DustTask extends DefaultTask {
   private static final Logger logger = LoggerFactory.getLogger(DustTask.class)
@@ -91,6 +92,7 @@ class DustTask extends DefaultTask {
   def run() {
     final DustCompiler compiler = new DustCompiler(getLessPath())
     String sourceDirPath = getSourceDir().canonicalPath
+    logger.info("Base less directory is " + sourceDirPath)
     File destDir = getDestDir()
     getSourceFiles().each { dustSource ->
       def sourcePath = dustSource.canonicalPath
@@ -106,6 +108,7 @@ class DustTask extends DefaultTask {
       }
 
       File destFile = new File(destDir, relativePath.replace('.tl', '.js'))
+      logger.info("Compile ${sourcePath} to ${destFile.canonicalPath}");
       destFile.parentFile.mkdirs()
       destFile.write(output)
     }

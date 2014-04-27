@@ -20,7 +20,7 @@ class DustCompiler {
         Context.exit()
       }
     } catch (Exception e) {
-      throw new Exception("Unable to load Dust engine: " e)
+      throw new Exception("Unable to load Dust engine: " + e)
     }
   }
 
@@ -30,7 +30,7 @@ class DustCompiler {
       Scriptable compileScope = context.newObject(globalScope)
       compileScope.setParentScope(globalScope)
       compileScope.put("source", compileScope, source)
-      compileScope.put("templateName", compileScope templateName)
+      compileScope.put("templateName", compileScope, templateName)
       try {
         return (String)context.evaluateString(
             compileScope, "(dust.compile(source, templateName))",
