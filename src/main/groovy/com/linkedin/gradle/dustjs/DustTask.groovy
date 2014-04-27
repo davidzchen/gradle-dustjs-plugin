@@ -1,0 +1,113 @@
+package com.linkedin.gradle.dustjs
+
+import com.linkedin.gradle.dustjs.ResourceUtil
+import com.linkedin.gradle.dustjs.RhinoExec
+
+import org.gradle.api.DefaultTask
+import org.gradle.api.InvalidUserDataException
+import org.gradle.api.file.FileTree
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.SkipWhenEmpty
+import org.gradle.api.tasks.TaskAction
+
+class DustTask extends DefaultTask {
+  private static final Logger logger = LoggerFactory.getLogger(DustTask.class)
+
+  private static final String DUST_PATH_PREFIX = 'dust-full-v'
+  private static final String DUST_PATH_SUFFIX = '.js'
+  private static final List<String> DUST_VERSION = ['2.3.4']
+  private static final String DUST_DEFAULT_VERSION = DUST_VERSION[0]
+  private static final String TMP_DIR = "tmp{$File.separator}js"
+
+  def source
+
+  @InputFiles
+  @SkipWhenEmpty
+  FileTree getSourceFiles() {
+    if (source == null || source.empty) {
+      throw new InvalidUserDataException("Missing property source for dustjs")
+    }
+    if (source instanceof ConfigurableFileTree) {
+      return source
+    } else {
+      return project.files(source).asFileTree
+    }
+  }
+
+  @InputDirectory
+  @SkipWhenEmpty
+  File getSourceDir() {
+    FileTree tree = getSourceFiles()
+    if (source.metaClass.hasProperty(source, "dir")) {
+      return source.dir
+    } else if (tree.files.size() == 1) {
+      return tree.singleFile.parentFile
+    } else {
+      throw new InvalidUserDataException(
+          "Use fileTree() for compiling multiple dust files.")
+    }
+  }
+
+  /**
+   * The output directory for compiled Dust templates.
+   */
+  @Input
+  def dest
+
+  @OutputDirectory
+  File getDestDir() {
+    if (dest == null) {
+      throw new InvalidUserDataException("Missing property dest for dustjs.")
+    }
+    return project.file(dst)
+  }
+
+  /**
+   * Sets the version of the Dust compiler.
+   */
+  @Input
+  String dustVersion = DUST_DEFAULT_VERSION
+
+  String getDustPath() {
+    if (!(dustVersion in DUST_VERSIONS)) {
+      throw new InvalidUserDataException(
+          "Unsupported dustjs compiler version. " +
+          "Supported versions $DUST_VERSIONS")
+    }
+    StringBuilder builder = new StringBuilder()
+    builder << DUST_PATH_PREFIX
+    builder << DUST_VERSION
+    builder << DUST_PATH_SUFFIX
+    return builder.toString()
+  }
+
+  /**
+   * Runs the task.
+   */
+  @TaskAction
+  def run() {
+    final DustCompiler compiler = new DustCompiler(getLessPath())
+    String sourceDirPath = getSourceDir().canonicalPath
+    File destDir = getDestDir()
+    getSourceFiles().each { dustSource ->
+      def sourcePath = dustSource.canonicalPath
+      String source = file(sourcePath).text
+      String templateName = dustSource.name
+      String output = compiler.compile(templateName, source)
+
+      String relativePath = null;
+      if (sourcePath.startsWith(sourceDirPath)) {
+        relativePath = sourcePath.substring(sourceDirpath.length())
+      } else {
+        relativePath = dustSource.name
+      }
+
+      File destFile = new File(destDir, relativePath.replace('.tl', '.js'))
+      destFile.parentFile.mkdirs()
+      destFile.write(output)
+    }
+  }
+}
