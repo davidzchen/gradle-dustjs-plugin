@@ -4,6 +4,8 @@ Gradle Dust.js Plugin
 A Gradle plugin that compiles [Dust.js](http://linkedin.github.io/dustjs/)
 templates.
 
+This plugin requires [LinkedIn Dust.js]
+
 Usage
 -----
 
@@ -36,3 +38,8 @@ dustjs {
   dest = 'src/main/webapp/assets/js'
 }
 ```
+
+### Acknowledgements ###
+
+This plugin makes use of code adapted from @obecker's [Gradle LESS plugin](https://github.com/obecker/gradle-lesscss-plugin)
+and @jmparson's [Play Framework Dust.js plugin](https://github.com/jmparsons/play-dustjs).
