@@ -1,24 +1,30 @@
 Gradle Dust.js Plugin [![Build Status](https://travis-ci.org/davidzchen/gradle-dustjs-plugin.svg?branch=master)](https://travis-ci.org/davidzchen/gradle-dustjs-plugin)
 =====================
 
-A Gradle plugin that compiles templates. This plugin requires [LinkedIn Dust.js](http://linkedin.github.io/dustjs).
+A Gradle plugin that compiles templates. This plugin requires [LinkedIn Dust.js](http://linkedin.github.io/dustjs) and uses [Rhino](http://mozilla.org/rhino) to run the Dust compiler.
 
 Usage
 -----
 
 ### Add the plugin ###
 
-**Note: We are still in the process of publishing the artifact. For now, please build from source and [include the JAR](http://www.gradle.org/docs/current/userguide/custom_plugins.html). This notice will be removed once the artifact has been published.**
+**Note: We are still in the process of publishing the artifact. For now, please build from source and [include the JAR](http://www.gradle.org/docs/current/userguide/custom_plugins.html). Instructions on pulling the artifact will be aded once it is published.**
 
-Add a buildscript dependency on the plugin to pull the artifact for the plugin.
+First, build this plugin from source:
+
+```
+$ gradle build
+```
+
+The jar will be in `build/libs/gradle-dustjs-plugin-1.0.jar`. Then, create a directory `gradle/plugin` in the root of your source tree, and copy the jar into the directory.
+
+Finally, add a buildscript dependency in your project's `build.gradle`:
 
 ```groovy
 buildscript {
-  repositories {
-    mavenCentral()
-  }
   dependencies {
-    classpath 'com.linkedin:gradle-dustjs-plugin:1.0.0'
+    classpath 'org.mozilla:rhino:1.7R4'
+    classpath files('gradle/plugin/gradle-dustjs-plugin-1.0.jar'
   }
 }
 ```
