@@ -35,8 +35,8 @@ class DustTask extends DefaultTask {
 
   private static final String DUST_PATH_PREFIX = 'dust-full-v'
   private static final String DUST_PATH_SUFFIX = '.js'
-  private static final List<String> DUST_VERSION = ['2.3.4']
-  private static final String DUST_DEFAULT_VERSION = DUST_VERSION[0]
+  private static final List<String> DUST_VERSIONS = ['2.3.4']
+  private static final String DUST_DEFAULT_VERSION = DUST_VERSIONS[0]
   private static final String TMP_DIR = "tmp{$File.separator}js"
 
   def source
@@ -79,7 +79,7 @@ class DustTask extends DefaultTask {
     if (dest == null) {
       throw new InvalidUserDataException("Missing property dest for dustjs.")
     }
-    return project.file(dst)
+    return project.file(dest)
   }
 
   /**
@@ -96,29 +96,26 @@ class DustTask extends DefaultTask {
     }
     StringBuilder builder = new StringBuilder()
     builder << DUST_PATH_PREFIX
-    builder << DUST_VERSION
+    builder << dustVersion
     builder << DUST_PATH_SUFFIX
     return builder.toString()
   }
 
-  /**
-   * Runs the task.
-   */
   @TaskAction
   def run() {
-    final DustCompiler compiler = new DustCompiler(getLessPath())
+    final DustCompiler compiler = new DustCompiler(getDustPath())
     String sourceDirPath = getSourceDir().canonicalPath
     logger.info("Base less directory is " + sourceDirPath)
     File destDir = getDestDir()
     getSourceFiles().each { dustSource ->
       def sourcePath = dustSource.canonicalPath
-      String source = file(sourcePath).text
-      String templateName = dustSource.name
+      String source = new File(sourcePath).text
+      String templateName = dustSource.name.replaceFirst(~/\.[^\.]+$/, '')
       String output = compiler.compile(templateName, source)
 
       String relativePath = null;
       if (sourcePath.startsWith(sourceDirPath)) {
-        relativePath = sourcePath.substring(sourceDirpath.length())
+        relativePath = sourcePath.substring(sourceDirPath.length())
       } else {
         relativePath = dustSource.name
       }

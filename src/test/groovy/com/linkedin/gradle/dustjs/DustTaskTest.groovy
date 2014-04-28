@@ -86,7 +86,7 @@ class DustTaskTest extends Specification {
     def actual = getGenerated("inline-outer.js").readLines()
     def expected = getProvided("inline-outer.js").readLines()
     actual == expected
-    dustjs.getLessPath() == 'dust-full-v2.3.4.js'
+    dustjs.getDustPath() == 'dust-full-v2.3.4.js'
   }
 
   def 'compile multiple files'() {

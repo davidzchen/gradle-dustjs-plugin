@@ -24,14 +24,15 @@ class DustCompiler {
 
   public DustCompiler(String fileName) {
     try {
-      final ClassLoader classLoader = Thread.getCurrentThread.contextClassLoader
-      final InputStream inputStream = classLoader.getResourceAsStream(path)
+      final ClassLoader classLoader = Thread.currentThread().contextClassLoader
+      final InputStream inputStream = classLoader.getResourceAsStream(fileName)
+      final InputStreamReader reader = new InputStreamReader(inputStream, 'UTF-8')
 
       Context context = Context.enter()
       context.setOptimizationLevel(9)
       try {
         globalScope = context.initStandardObjects()
-        context.evaluateReader(globalScope, dustReader, filename, 0, null)
+        context.evaluateReader(globalScope, reader, fileName, 0, null)
       } finally {
         Context.exit()
       }

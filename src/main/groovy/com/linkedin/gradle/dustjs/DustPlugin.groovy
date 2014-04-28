@@ -19,6 +19,10 @@ package com.linkedin.gradle.dustjs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
+/**
+ * Gradle dustjs plugin. Adds the <code>dustjs</code> task to the current
+ * project.
+ */
 class DustPlugin implements Plugin<Project> {
   void apply(final Project project) {
     configureDependencies(project)
