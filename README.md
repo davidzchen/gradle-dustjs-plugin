@@ -43,7 +43,7 @@ Tasks
 
 This plugin adds the `dustjs` task and the implicit `cleanDustjs` task.
 
-### `dustjs` ###
+### dustjs ###
 
 The `dustjs` task compiles the specified Dust .tl files from the `source` directory into .js files into the `dest` directory.
 
@@ -53,11 +53,12 @@ The basename of the template file is used as the template name. For example, if 
 $ dustc --name=template source/template.tl dest/template.js
 ```
 
-### `cleanDustjs` ###
+### cleanDustjs ###
 
 The `cleanDustjs` task completely deletes the `dest` directory.
 
-### Acknowledgements ###
+Acknowledgements
+----------------
 
 This plugin makes use of code adapted from Oliver Becker's [Gradle LESS plugin](https://github.com/obecker/gradle-lesscss-plugin)
 and Jonathan Parsons' [Play Framework Dust.js plugin](https://github.com/jmparsons/play-dustjs).
