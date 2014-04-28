@@ -8,6 +8,8 @@ Usage
 
 ### Add the plugin ###
 
+**Note: We are still in the process of publishing the artifact. For now, please build from source and [include the JAR](http://www.gradle.org/docs/current/userguide/custom_plugins.html). This notice will be removed once the artifact has been published.**
+
 Add a buildscript dependency on the plugin to pull the artifact for the plugin.
 
 ```groovy
